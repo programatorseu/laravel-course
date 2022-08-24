@@ -74,10 +74,66 @@ date: 2020-04-24
 ```
 
 
-## 2. Blade
-```php
-@foreach($courses as $course) 
-@dd($loop)
-@endforeach 
+## 2. Working with DB
+### 2.1 Eloquent and Active Record Pattern
+Models/ - > eloquent models (way to interact with our database tables)
+each table has corresponding model 
+users -> User model - > **active Record Pattern** ('object instance tied to single row')
+```php 
+php artisan tinker
+$user = new App\Models\User;
+$user = new User; # tinker will figure out
+
+$user->name = "Piotr";
+=> "Piotr"
+$user->email = "<email>"
+$user->password = bcrypt("bleki123");
+$user->save();
+User::find(1);
+User::findOrFail(2);
+
+$users = User::all();
+$users->pluck('name');
+
 ```
 
+### 2.2 Make Course model + migration
+
+now is only empty mode with extended feature from Eloquent.
+- create migration 
+
+to avoid mass asignment vulnerabilities:
+```php
+    protected $fillable = ['id', 'title', 'body', 'date'];
+```
+
+### 2.3 Route Model Binding 
+
+- change in migration & migrate fresh
+```php
+    $table->string('url')->unique();
+```
+
+- inside our Model
+```php
+  public function getRouteKeyName() 
+    {
+        return 'slug';
+    }
+```
+
+layout 
+```php
+<?php foreach($courses as $course): ?>
+    
+    <article>
+       <h1>
+           <a href="/courses/<?=$course->url;?>">
+            <?= $course->title; ?></h1>
+            </a>
+       <div>
+           <?= $course->body; ?>
+       </div>
+    </article>
+<?php endforeach; ?>  
+```

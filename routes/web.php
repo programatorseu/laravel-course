@@ -16,12 +16,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('courses', [
-        'courses' => Course::findAll()
+        'courses' => Course::all()
     ]);
 });
-
-Route::get('courses/{course}', function($title) {
+Route::get('courses/{course}', function (Course $course) {
     return view('course', [
-        'course' => Course::find($title)
+        'course' => $course
     ]);
-})->whereAlpha('course');
+});
