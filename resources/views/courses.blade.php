@@ -6,7 +6,7 @@
         @foreach($courses as $course)
             <x-course-item :course="$course" class="{{$loop->iteration < 3 ? 'col-span-3' : 'col-span-2'}}"></x-course-item>
         @endforeach
-
+        {{$courses->links()}}
     </div>
     @else
     <p>Brak szkoleń</p>

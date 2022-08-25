@@ -530,3 +530,30 @@ reder method of that class
         );
         ..
  ```
+
+ ## 6. Pagination
+
+ paginate() return all data + information necessary for paginating 
+
+- current page we are on
+- number of links 
+- per_page 
+
+`/?page=2`
+```php
+            'courses' => Course::latest()->filter(request(['search', 'type']))->paginate(2)
+```
+
+add to index `{{$courses->lins()}}`
+
+- exclude from query in dropdown : 
+```php
+    <x-dropdown-item 
+        href="?type={{$type->slug}} & {{ http_build_query(request()->except('type', 'page')) }}"
+        :active="request()->is('types/' . $type->slug)"
+        >{{ucwords($type->name) }}</x-dropdown-item>
+```
+-> include existing query string in pagination : 
+```php
+paginate(2)->withQueryString()
+```

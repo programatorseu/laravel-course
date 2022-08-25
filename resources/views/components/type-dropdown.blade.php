@@ -9,7 +9,7 @@
     <x-dropdown-item href="/" :active="request()->routeIs('home')">All</x-dropdown-item>
     @foreach($types as $type)
     <x-dropdown-item 
-        href="?type={{$type->slug}} & {{ http_build_query(request()->except('type')) }}"
+        href="?type={{$type->slug}} & {{ http_build_query(request()->except('type', 'page')) }}"
         :active="request()->is('types/' . $type->slug)"
         >{{ucwords($type->name) }}</x-dropdown-item>
     @endforeach
