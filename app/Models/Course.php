@@ -8,22 +8,25 @@ use Illuminate\Database\Eloquent\Model;
 class Course extends Model
 {
     use HasFactory;
-    protected $fillable = ['id', 'title', 'body', 'date', 'url'];
+    protected $guarded = [];
     protected $with = ['type', 'creator'];
 
     // 1st param passed by laravel
     public function scopeFilter($query, array $args)  
     {  
-        $query->when($args['search'] ?? false, function($query, $search){
-            $query
-                ->where('title', 'like', '%' . $search . '%')
-                ->orWhere('body', 'like', '%' . $search . '%');
-            });
-        $query->when($args['type'] ?? false, function($query, $type) {
-            $query->whereHas('type', function($query) {
-                $query->where('slug', $type);
-            });
-        });
+           $query->when($args['search'] ?? false, fn($query, $search) =>
+            $query->where(fn($query) =>
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('body', 'like', '%' . $search . '%')
+            )
+        );
+         
+        $query->when($args['type'] ?? false, fn($query, $type) =>
+                $query->whereHas('type', fn ($query) =>
+                    $query->where('slug', $type)
+                )
+                );
+                                
     }
 
     public function getRouteKeyName() 
