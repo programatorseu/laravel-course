@@ -1,6 +1,8 @@
 <?php
 
 use App\Models\Course;
+use App\Models\Type;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,11 +18,24 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('courses', [
-        'courses' => Course::all()
+        'courses' => Course::latest()->with('type', 'creator')->get()
     ]);
 });
 Route::get('courses/{course}', function (Course $course) {
     return view('course', [
         'course' => $course
+    ]);
+});
+
+Route::get('types/{type}', function(Type $type) {
+    return view('courses', [
+        'courses' => $type->courses
+    ]);
+});
+
+Route::get('creators/{creator:username}', function(User $creator) {
+
+    return view('courses', [
+        'courses' => $creator->courses
     ]);
 });
