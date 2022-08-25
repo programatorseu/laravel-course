@@ -9,8 +9,17 @@ class Course extends Model
 {
     use HasFactory;
     protected $fillable = ['id', 'title', 'body', 'date', 'url'];
-
     protected $with = ['type', 'creator'];
+
+    // 1st param passed by laravel
+    public function scopeFilter($query, array $args)  
+    {  
+        if($args['search'] ?? false) {
+            $query
+                ->where('title', 'like', '%' . request('search') . '%')
+                ->orWhere('body', 'like', '%' . request('search') . '%');
+        }
+    }
 
     public function getRouteKeyName() 
     {

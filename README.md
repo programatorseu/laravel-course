@@ -391,3 +391,45 @@ Route::get('/', function () {
                     @endforeach
                 </x-dropdown> 
 ```
+
+## 4. Controller - search feature 
+ 1. controller with index (search from <scopeFilter>) and show 
+ 2. update web route file
+ 3. create query `scopeFilter` inside Eloquent model 
+
+
+```php
+    public function index() 
+    {
+        return view('courses', [
+            'courses' => Course::latest()->filter(request(['search']))->get(),
+            'types' => Type::all()
+        ]);
+    }
+
+    public function show(Course $course) 
+    {
+        return view('course', [
+            'course' => $course
+        ]);
+    }
+```
+
+2. Route file 
+```php
+Route::get('/', [CourseController::class, 'index'])->name('home');
+Route::get('courses/{course}', [CourseController::class, 'show']);
+```
+
+3.
+```php
+    // 1st param passed by laravel
+    public function scopeFilter($query, array $args)  
+    {  
+        if($args['search'] ?? false) {
+            $query
+                ->where('title', 'like', '%' . request('search') . '%')
+                ->orWhere('body', 'like', '%' . request('search') . '%');
+        }
+    }
+```

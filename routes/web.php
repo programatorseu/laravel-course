@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\CourseController;
 use App\Models\Course;
 use App\Models\Type;
 use App\Models\User;
@@ -13,21 +15,10 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-
-Route::get('/', function () {
-    return view('courses', [
-        'courses' => Course::latest()->with('type', 'creator')->get(),
-        'types' => Type::all()
-    ]);
-})->name('home');
+Route::get('/', [CourseController::class, 'index'])->name('home');
+Route::get('courses/{course}', [CourseController::class, 'show']);
 
 
-
-Route::get('courses/{course}', function (Course $course) {
-    return view('course', [
-        'course' => $course
-    ]);
-});
 
 Route::get('types/{type:slug}', function(Type $type) {
     return view('courses', [
