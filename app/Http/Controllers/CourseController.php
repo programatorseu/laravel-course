@@ -13,8 +13,7 @@ class CourseController extends Controller
     public function index() 
     {
         return view('courses', [
-            'courses' => Course::latest()->filter(request(['search', 'type']))->get(),
-            'types' => Type::all()
+            'courses' => Course::latest()->filter(request(['search', 'type']))->get()
         ]);
     }
 

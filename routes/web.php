@@ -20,17 +20,17 @@ Route::get('courses/{course}', [CourseController::class, 'show']);
 
 
 
-Route::get('types/{type:slug}', function(Type $type) {
-    return view('courses', [
-        'courses' => $type->courses,
-        'types' => Type::all(),
-        'currentType' => $type
-    ]);
-});
+// Route::get('types/{type:slug}', function(Type $type) {
+//     return view('courses', [
+//         'courses' => $type->courses,
+//         'types' => Type::all(),
+//         'currentType' => $type
+//     ]);
+// })->name('type');
 
 Route::get('creators/{creator:username}', function(User $creator) {
-
     return view('courses', [
-        'courses' => $creator->courses
+        'courses' => $creator->courses,
+        'types' => Type::all()
     ]);
 });

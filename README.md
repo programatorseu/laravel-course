@@ -444,6 +444,7 @@ We want to achieve:
 ```bash
 ?types=esse-nemo-temporibus
 ```
+then we are going to use combine - search & type 
 
 **steps**
 1. pass conditional to check type to our filter -> inside @index method 
@@ -453,3 +454,104 @@ We want to achieve:
 ```php
     'courses' => Course::latest()->filter(request(['search', 'type']))->get(),
 ```
+
+Scope Filter method
+* whereHas - eloquent relationship 
+
+```php
+    public function scopeFilter($query, array $args)  
+    {  
+        $query->when($args['search'] ?? false, fn($query, $search) => 
+                $query
+                    ->where('title', 'like', '%' . request('search') . '%')
+                    ->orWhere('body', 'like', '%' . request('search') . '%'));
+         
+        $query->when($args['type'] ?? false, fn($query, $type) =>
+                $query->whereHas('type', fn ($query) =>
+                    $query->where('slug', $type)
+                )
+                );
+                                
+    }
+```
+
+* make type comoopnent
+```bash
+php artisan make:component TypeDropdown
+```
+- creates view/components 
+- creates app/view/Components/TypeDropdown class 
+
+Inide header file
+```php
+   <!--  type -->
+    <div class="relative flex lg:inline-flex items-center bg-gray-100 rounded-xl">
+         <x-type-dropdown/>
+    </div>
+```
+
+reder method of that class
+```php
+    public function render()
+    {
+        return view('components.type-dropdown',[
+            'types' => Type::all(),
+            'currentType' => Type::where('slug', request('type'))->first()
+
+        ]);
+    }
+```
+
+### 5.2 merge Type and Search 
+-> we want to search within selected type 
+ -> add hidden input 
+```php
+         <form method="GET" action="/">
+                @if(request('type'))
+                    <input type="hidden" name="type" value="{{request('type') }}" />
+                @endif
+```
+ -> reverse approach build href inside dropdown 
+```php
+ <x-dropdown-item 
+        href="?type={{$type->slug}} & {{ http_build_query(request()->except('type')) }}"
+
+```
+
+ fix:
+ ```php
+ 
+           $query->when($args['search'] ?? false, fn($query, $search) =>
+            $query->where(fn($query) =>
+                $query->where('title', 'like', '%' . $search . '%')
+                    ->orWhere('body', 'like', '%' . $search . '%')
+            )
+        );
+        ..
+ ```
+
+### 6. Pagination
+
+paginate() return all data + information necessary for paginating : 
+- current page we are on
+- number of links 
+- per_page 
+
+```php
+'courses' => Course::latest()->filter(request(['search', 'type']))->paginate(2),
+```
+
+
+
+```bash
+http://127.0.0.1:8000/?page=3
+```
+
+add to index
+`{{$courses->links()}}`
+
+dropdown -> exclude page 
+```php
+<x-dropdown-item    href="/types/{{ $type->slug }}&{{ http_build_query(request()->except('type', 'page')) }}"
+```
+
