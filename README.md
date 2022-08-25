@@ -433,3 +433,23 @@ Route::get('courses/{course}', [CourseController::class, 'show']);
         }
     }
 ```
+
+---
+### 5. Filtering 
+#### 5.1 Eloquent Query Contraints
+
+Sql function `EXISTS` allow to pass `SELECT stmt` and check truthness of clause 
+
+We want to achieve: 
+```bash
+?types=esse-nemo-temporibus
+```
+
+**steps**
+1. pass conditional to check type to our filter -> inside @index method 
+2. reproduce with eloquent sql which looks like (exist sql function)
+
+
+```php
+    'courses' => Course::latest()->filter(request(['search', 'type']))->get(),
+```

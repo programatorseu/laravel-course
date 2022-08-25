@@ -14,11 +14,16 @@ class Course extends Model
     // 1st param passed by laravel
     public function scopeFilter($query, array $args)  
     {  
-        if($args['search'] ?? false) {
+        $query->when($args['search'] ?? false, function($query, $search){
             $query
-                ->where('title', 'like', '%' . request('search') . '%')
-                ->orWhere('body', 'like', '%' . request('search') . '%');
-        }
+                ->where('title', 'like', '%' . $search . '%')
+                ->orWhere('body', 'like', '%' . $search . '%');
+            });
+        $query->when($args['type'] ?? false, function($query, $type) {
+            $query->whereHas('type', function($query) {
+                $query->where('slug', $type);
+            });
+        });
     }
 
     public function getRouteKeyName() 
