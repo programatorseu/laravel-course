@@ -296,3 +296,98 @@ Route::get('creators/{creator:username}', function(User $creator) {
 ```php
     protected $with = ['type', 'creator'];
 ```
+
+---
+
+### 3. Layout - component
+
+images - public/images
+
+refer 
+```html
+   <img src="./images/logo.svg"
+```
+component blade used 
+
+#### 3.1 dropdown
+- import alpine library 
+
+ x-data component -> show to false and bind it with bottom links 
+- then we add `x-show` into inner div 
+button @click event - set to the opposite what show currently is 
+
+Basically 3 components file 
+- dropdown
+- dropdown-item
+- icon for arrows 
+`component/dropdown.blade.php`
+```php
+@props(['trigger'])
+<div x-data="{ show:false }" @click.away="show = false">
+    <div @click="show = ! show">
+        {{ $trigger }}
+    </div>
+    <div x-show="show" class="py-2 absolute bg-gray-100 w-full mt-2 rounded-xl z-50 max-h-52" style="display: none">
+        {{$slot}}
+    </div>
+</div>
+```
+item:
+```php
+@props(['active' => false])
+@php
+    $classes = 'block text-left px-3 text-sm leading-6 hover:bg-blue-500 focus:bg-blue-500 hover:text-white focus:text-white';
+    if ($active) $classes .= ' bg-blue-500 text-white';
+@endphp
+<a {{ $attributes(['class' => $classes]) }}>
+{{ $slot }}</a>
+
+```
+
+icon
+
+```php
+@props(['name'])
+@if($name === 'down-arrow')
+<svg {{ $attributes(['class' => 'transform -rotate-90']) }}style="right: 12px;" width="22" height="22" viewBox="0 0 22 22">
+    <g fill="none" fill-rule="evenodd">
+    <path stroke="#000" stroke-opacity=".012" stroke-width=".5" d="M21 1v20.16H.84V1z">
+</path>
+    <path fill="#222"
+      d="M13.854 7.224l-3.847 3.856 3.847 3.856-1.184 1.184-5.04-5.04 5.04-5.04z"></path>
+    </g>
+</svg>
+@endif
+```
+
+add named route  to help set up active based on uri 
+
+```php
+Route::get('/', function () {
+    return view('courses', [
+        'courses' => Course::latest()->with('type', 'creator')->get(),
+        'types' => Type::all()
+    ]);
+})->name('home');
+```
+
+**header file with dropdow applied**
+
+
+```php
+  <x-dropdown>
+                    <x-slot name="trigger">
+                        <button
+                         class="py-2 pl-3 pr-9 text-sm font-semibold w-full lg:w-32 text-left flex lg:inline-flex">Types
+                    <x-icon name="down-arrow" class="absolute pointer-events-none" style="right:12px;" />
+                    </button>
+                    </x-slot>
+                    <x-dropdown-item href="/" :active="request()->routeIs('home')">All</x-dropdown-item>
+                    @foreach($types as $type)
+                    <x-dropdown-item 
+                        href="/types/{{$type->slug}}"
+                        :active="request()->is('types/' . $type->slug)"
+                        >{{ucwords($type->name) }}</x-dropdown-item>
+                    @endforeach
+                </x-dropdown> 
+```
