@@ -20,10 +20,9 @@
                     <x-icon name="down-arrow" class="absolute pointer-events-none" style="right:12px;" />
                     </button>
                     </x-slot>
-                    <x-dropdown-item href="/" :active="request()->routeIs('home')">All</x-dropdown-item>
-                    @foreach($types as $type)
+                    <x-dropdown-item href="/{{http_build_query(request()->except('type', 'page')) }}" :active="request()->routeIs('home')">All</x-dropdown-item>                    @foreach($types as $type)
                     <x-dropdown-item 
-                        href="/types/{{$type->slug}}"
+                        href="/types/{{ $type->slug }}&{{ http_build_query(request()->except('type', 'page')) }}"
                         :active="request()->is('types/' . $type->slug)"
                         >{{ucwords($type->name) }}</x-dropdown-item>
                     @endforeach

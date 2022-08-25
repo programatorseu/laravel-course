@@ -453,3 +453,19 @@ We want to achieve:
 ```php
     'courses' => Course::latest()->filter(request(['search', 'type']))->get(),
 ```
+--TODO-- : coming back to this feature
+
+### 6. Pagination
+
+paginate() return all data + information necessary for paginating : 
+- current page we are on
+- number of links 
+- per_page 
+
+```php
+'courses' => Course::latest()->filter(request(['search', 'type']))->paginate(2),
+```
+
+```bash
+http://127.0.0.1:8000/?page=3
+```
