@@ -4,7 +4,8 @@
     >
                         <div class="py-6 px-5">
                             <div>
-                                <img src="./images/szolenie-1.jpg" alt="szkolenie" class="rounded-xl">
+                                <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="Blog Post illustration" class="rounded-xl">
+
                             </div>
     
                             <div class="mt-8 flex flex-col justify-between">

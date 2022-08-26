@@ -32,6 +32,8 @@ Route::post('logout', [SessionController::class, 'destroy'])->middleware('auth')
 
 Route::post('courses/{course}/comments', [CourseCommentController::class, 'store']);
 
+Route::get('admin/courses/create', [CourseController::class, 'create'])->middleware('admin');
+Route::post('admin/courses', [CourseController::class, 'store'])->middleware('admin');
 
 
 

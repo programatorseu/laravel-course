@@ -776,3 +776,133 @@ class Comment extends Model
         return back();
     }
  ```
+
+ ---
+ ## 8. Admin section
+
+ - CourseController
+ ```php
+     public function create() 
+    {
+        if(auth()->guest()) {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+        if(auth()->user()->username !== 'piotrek') {
+            abort(Response::HTTP_FORBIDDEN);
+        }
+        return view('courses.create');
+    }
+ ```
+
+ web route file  :
+ ```php
+ Route::get('admin/course/create', [CourseController::class, 'create']);
+ ```
+
+**Create middleware**
+`php artisan make:middleware MustBeAdmin`
+
+update Kernel file
+```php
+   protected $routeMiddleware = [
+        'auth' => \App\Http\Middleware\Authenticate::class,
+        'admin' => MustBeAdmin::class,
+   ]
+```
+
+route file
+`Route::get('admin/course/create', [CourseController::class, 'create'])->middleware('admin');`
+
+
+### 8.1 Publish form
+1. create route 
+2. create form with @error
+3. create @store  - use `Illuminate\Validation\Rule` facade
+```php
+Route::post('admin/courses', [CourseController::class, 'store'])->middleware('admin');
+```
+
+
+
+```php
+    public function store()
+    {
+        $attributes = request()->validate([
+            'title' => 'required',
+            'url' => ['required', Rule::unique('courses', 'url')],
+            'date' => 'required',
+            'body' => 'required',
+            'type_id' => ['required', Rule::exists('types', 'id')]
+        ]);
+
+        $attributes['user_id'] = auth()->id();
+
+        Course::create($attributes);
+
+        return redirect('/');
+    }
+```
+
+### 8.2 Thumnail - validate store
+-> enctype change to signify we are going to upload file 
+-> add input type file to form 
+```php
+    <form enctype="multipart/form-data">
+    ..
+    <div class="mb-6">
+        <label class="block mb-2 uppercase font-bold text-xs text-gray-700" for="thumbnail">
+            Thumbnail
+        </label>
+        <input class="border border-gray-400 p-2 w-full"
+            type="file"
+            name="thumbnail"
+            id="thumbnail"
+            required
+        >
+        @error('thumbnail')
+        <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
+        @enderror
+    </div>
+            
+```
+Controller@store 
+
+`request()->file('image')->store('img');`
+- image name of file image1.jpg
+- img name of folder `storage/app/img/`
+
+
+```php
+// @store
+    $attributes = request()->validate([  
+     'thumbnail' => 'required|image',
+    ...
+    ]);
+...
+    $attributes['thumbnail'] = request()->file('thumbnail')->store('img');
+```
+
+update : 
+`app/config/filesystems.php` -> storage_path change to public 
+```php
+    'default' => env('FILESYSTEM_DRIVER', 'public'),
+```
+now 
+`storage/app/public/`
+
+-> make storage link (symlink)
+```bash
+php artisan storage:link
+```
+
+-> add in migration (Course)
+```php
+$table->string('thumbnail')->nullable();
+```
+
+update course.blade.php to show image: 
+ with `asset()` method
+
+ ```php
+     <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="Course image" class="rounded-xl">
+ ```

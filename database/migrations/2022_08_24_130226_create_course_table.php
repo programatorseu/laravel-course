@@ -18,6 +18,7 @@ class CreateCourseTable extends Migration
             $table->foreignId('user_id');
             $table->foreignId('type_id');
             $table->string('title');
+            $table->string('thumbnail')->nullable();
             $table->string('date');
             $table->text('body');
             $table->string('url')->unique();
