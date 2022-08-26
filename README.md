@@ -692,3 +692,87 @@ Route::post('logout', [SessionController::class, 'destroy']);
         session()->regenerate();
         return redirect('/')->with('success', 'Welcome Back');
  ```
+
+ ---
+ ## 8. Comments
+ 1. Make migration + controller factory 
+ There is a class ```ForeignColumnDefinition```
+- constrained() method with reference on specific column to add 
+
+2. setup relationship between eloquent models 
+```php
+    public function up()
+    {
+        Schema::create('comments', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('course_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+            $table->text('body');
+            $table->timestamps();
+        });
+    }
+```
+factory
+```php
+class CommentFactory extends Factory
+{
+    public function definition()
+    {
+        return [
+            'course_id' => Course::factory(),
+            'user_id' => User::factory(),
+            'body' => $this->faker->paragraph()  
+        ];
+    }
+}
+```
+Course:
+```php
+   public function comments() 
+    {
+        return $this->hasMany(Comment::class);
+    }
+```
+Comment: 
+```php
+class Comment extends Model
+{
+    use HasFactory;
+    public function course() 
+    {
+        return $this->belongsTo(Course::class);
+    }
+    public function creator() 
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+}
+```
+
+- comment form inside course - item page
+ - comment extracted into component
+
+ route file : we need to tell which course is it  
+
+ ```php
+  <form action="/courses/{{$course->url}}/comments" class="border border-gray-200 p-6 rounded-xl">
+ ```
+
+ ```php
+ Route::post('courses/{course}/comments', [CourseCommentController::class, 'store']);
+ ```
+ 
+ @store method 
+ ```php
+     public function store(Course $course) 
+    {
+        request()->validate([
+            'body' => 'required'
+        ]);
+        $course->comments()->create([
+            'user_id' => request()->user()->id,
+            'body' => request('body')
+        ]);
+        return back();
+    }
+ ```
