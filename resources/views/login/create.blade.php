@@ -6,39 +6,10 @@
             <form method="post" action="/login" class="mt-10">
                 @csrf
 
-     
+    
+                <x-form.input name="email" />
+                <x-form.input name="password" type="password" />
 
-                <x-form.input name="title" />
-
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700"
-                           for="email"
-                    >
-                        Email
-                    </label>
-
-                    <input class="border border-gray-400 p-2 w-full"
-                           type="text"
-                           name="email"
-                           id="email"
-                           
-                    />
-                </div>
-
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700"
-                           for="password"
-                    >
-                        Password
-                    </label>
-
-                    <input class="border border-gray-400 p-2 w-full"
-                           type="password"
-                           name="password"
-                           id="passowrd"
-                           required
-                    />
-                </div>
                 <button>Login</button>
             </form>
             @foreach($errors->all() as $error)

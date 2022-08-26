@@ -911,4 +911,103 @@ update course.blade.php to show image:
  ### 8.3 Extract Form component 
  componets/form/input.blade.php
  `<x-form.input name="Title" />` -- to refer that file 
- 
+
+so our create will look like 
+```php
+<x-layout>
+    <section class="px-6 py-8">
+        <main class="max-w-lg mx-auto mt-10 bg-gray-100 border border-gray-200 p-6 rounded-xl">
+            <form method="POST" action="/admin/courses" enctype="multipart/form-data">
+                @csrf
+                <x-form.input name="title" />
+                <x-form.input name="slug" />
+                <x-form.input name="thumbnail" type="file" />
+                <x-form.textarea name="excerpt" />
+                <x-form.textarea name="body" />
+                <x-form.field>
+                    <x-form.label name="type" />
+
+                    <select name="type_id" id="type_id">
+                        @foreach (\App\Models\Type::all() as $type)
+                            <option
+                                value="{{ $type->id }}"
+                                {{ old('type_id') == $type->id ? 'selected' : '' }}
+                            >{{ ucwords($type->name) }}</option>
+                        @endforeach
+                    </select>
+
+                    <x-form.error name="type" />
+                </x-form.field>
+                <x-form.button>Publish</x-form.button>
+            </form>
+        </main>
+    </section>
+</x-layout>
+
+```
+
+### 8.4 Extend Admin layout 
+
+-> use dropdown component 
+
+```php
+    <div class="mt-8 md:mt-0 flex items-center">
+                @auth
+                <x-dropdown>
+                    <x-slot name="trigger">
+                        <button class="text-xs font-bold uppercase">Welcome, {{ auth()->user()->name }}!</button>
+                    </x-slot>
+
+                    <x-dropdown-item href="/admin/dashboard">Dashboard</x-dropdown-item>
+                    <x-dropdown-item href="/admin/courses/create" :active="request()->is('admin/courses/create')">New Post</x-dropdown-item>
+                    <x-dropdown-item href="#" x-data="{}" @click.prevent="document.querySelector('#logout-form').submit()">Log Out</x-dropdown-item>
+
+                    <form id="logout-form" method="POST" action="/logout" class="hidden">
+                        @csrf
+                    </form>
+                </x-dropdown>
+            @else
+                <a href="/register" class="text-xs font-bold uppercase {{ request()->is('register') ? 'text-blue-500' : '' }}">Register</a>
+                <a href="/login" class="ml-6 text-xs font-bold uppercase {{ request()->is('login') ? 'text-blue-500' : '' }}">Log In</a>
+            @endauth
+          
+            </div>
+```
+
+### 8.5 Admin - update / delete / create seciton
+1. update route inside web.php : 
+```php
+Route::post('admin/courses', [AdminController::class, 'store'])->middleware('admin');
+Route::get('admin/courses/create', [AdminController::class, 'create'])->middleware('admin');
+Route::get('admin/courses', [AdminController::class, 'index'])->middleware('admin');
+Route::get('admin/courses/{course}/edit', [AdminController::class, 'edit'])->middleware('admin');
+Route::patch('admin/courses/{course}', [AdminController::class, 'update'])->middleware('admin');
+Route::delete('admin/courses/{course}', [AdminController::class, 'destroy'])->middleware('admin');
+```
+2. create controller and populate with all necessary methods 
+- create component/setting.blade.php 
+- create admin/courses/index.blade.php
+
+AppServiceProvider
+-> use Gate facade
+```php
+  public function boot()
+    {
+        Model::unguard();
+
+        Gate::define('admin', function (User $user) {
+            return $user->username === 'Piotrek S';
+        });
+
+        Blade::if('admin', function () {
+            return request()->user()?->can('admin');
+        });
+    }
+```
+-> layout File
+```php
+                    @admin
+                    <x-dropdown-item href="/admin/dashboard">Dashboard</x-dropdown-item>
+                    <x-dropdown-item href="/admin/courses/create" :active="request()->is('admin/courses/create')">New Post</x-dropdown-item>
+                    @endadmin
+```
