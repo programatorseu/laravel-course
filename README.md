@@ -531,8 +531,6 @@ reder method of that class
         ..
  ```
 
-
-=======
  ## 6. Pagination
 
  paginate() return all data + information necessary for paginating 
@@ -561,3 +559,136 @@ add to index `{{$courses->lins()}}`
 ```php
 paginate(2)->withQueryString()
 ```
+
+## 7. Admin section 
+- create controller to get and post method 
+- form(@csrf remember)
+- turn off fillable to avoid  SQLSTATE[HY000]: General error: 1364
+
+### 7.1 Password hashing with mutator 
+
+- to check password in Tinker use:
+```
+Illuminate\Support\Facades\Hash::check('password', $annia->password);
+```
+
+Model
+```php
+    public function setPasswordAttribute($password) 
+    {
+        $this->attributes['password'] = bcrypt($password);
+    }
+```
+
+### 7.2 Failed message + old input 
+
+@error directive: 
+```php
+          @error('name')
+                        <p class="text-red-500 text-xs mt-1">{{$message}}</p>
+                    @enderror
+```
+
+or we can show all error messages 
+```php
+    @foreach($errors->all() as $error)
+        <li>{{$error}}</li>
+    @endforeach
+```
+
+```php
+    value="{{old('name')}}"
+```
+
+- update validation rules for unique values : 
+```php
+    'username' => 'required|min:3|max:255|unique:users, username',
+    'email' => 'required|email|max:255|unique:users, email',
+```
+
+
+### 7.3 Success flash message
+- create component for flashing that message (flash message for few seconds)
+ * alpine.js library 
+ * declared as alpine components 
+ * init with timeout -> set show to false after 4 seconds 
+
+ ```php
+@if (session()->has('success'))
+    <div x-data="{ show: true }"
+         x-init="setTimeout(() => show = false, 4000)"
+         x-show="show"
+         class="fixed bg-blue-500 text-white py-2 px-4 rounded-xl bottom-3 right-3 text-sm"
+    >
+        <p>{{ session('success') }}</p>
+    </div>
+@endif
+ ```
+
+`</section><x-flash/>` - layout.blade
+
+Register@store:
+```php
+      User::create($attributes);
+        return redirect('/')->with('success', 'Your account has been created')
+```
+
+### 7.4 auth-Login / Logout
+1.add to @store method
+2.set middleware 
+3.change in RouteServiceProvider  PATH  - > Auth Middleware uses to redirect 
+4.Add logout to web route
+5 create SessionController@destroy
+```php
+ $user = User::create($attributes);
+        auth()->login($user);        
+```
+
+```php
+Route::get('register', [RegisterController::class, 'create'])->middleware('guest');
+Route::post('register', [RegisterController::class, 'store'])->middleware('guest');
+```
+
+```php
+    public const HOME = '/';
+```
+
+```php
+Route::post('logout', [SessionController::class, 'destroy']);
+```
+```php
+
+ public function destroy() 
+    {
+        auth()->logout();
+        return redirect('/')->with('success', 'Goodbye');
+    }
+```
+
+
+
+
+### 7.5 Manual login : 
+1. proper routing for login - get & post 
+2. Corresponding methods inside Controller
+3. create view
+4. Security measure :
+    - Session Fixation is an attack that permits an attacker to hijack a valid user session
+ * so after logged in we need to regenerate id 
+
+
+
+ ```php
+ // store: 
+         $attributes = request()->validate([
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);  
+        if(! auth()->attempt($attributes)) {
+            return back()
+            ->withInput()
+            ->withErrors(['email' => 'Your provided cred could not be verified']);
+        }
+        session()->regenerate();
+        return redirect('/')->with('success', 'Welcome Back');
+ ```

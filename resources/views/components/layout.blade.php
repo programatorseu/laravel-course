@@ -15,11 +15,19 @@
             </div>
 
             <div class="mt-8 md:mt-0">
-                <a href="/" class="text-xs font-bold uppercase">Home Page</a>
+                @auth
+                <span class="text-xs font-bold uppercase">
+                    Welcome, {{auth()->user()->name }} !
+                </span>
+                <form action="/logout" method="POST" class="text-xs font-semibold text-blue-500 ml-6">
+                    @csrf
+                    <button type="submit">Log Out</button>
+                </form>
+                @else
+                    <a href="/register" class="text-xs font-bold uppercase">Register</a>
+                @endauth
 
-                <a href="#" class="bg-blue-500 ml-3 rounded-full text-xs font-semibold text-white uppercase py-3 px-5">
-                    Signup
-                </a>
+          
             </div>
         </nav>
 
@@ -33,5 +41,6 @@
             <p class="text-sm mt-3">Footer copyright shit information</p>
         </footer>
     </section>
+    <x-flash/>
 </body>
 <script defer src="https://unpkg.com/alpinejs@3.8.1/dist/cdn.min.js"></script>
