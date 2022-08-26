@@ -4,104 +4,14 @@
 
             <form method="POST" action="/admin/courses" enctype="multipart/form-data">
                 @csrf
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700"
-                           for="title"
-                    >
-                        Title
-                    </label>
 
-                    <input class="border border-gray-400 p-2 w-full"
-                           type="text"
-                           name="title"
-                           id="title"
-                           value="{{ old('title') }}"
-                           required
-                    >
-
-                    @error('title')
-                        <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700"
-                           for="url"
-                    >
-                        Url
-                    </label>
-
-                    <input class="border border-gray-400 p-2 w-full"
-                           type="text"
-                           name="url"
-                           id="url"
-                           value="{{ old('url') }}"
-                           required
-                    >
-
-                    @error('url')
-                        <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700"
-                           for="date"
-                    >
-                        date
-                    </label>
-
-                    <textarea class="border border-gray-400 p-2 w-full"
-                           name="date"
-                           id="date"
-                           required
-                    >{{ old('date') }}</textarea>
-
-                    @error('date')
-                        <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700"
-                           for="body"
-                    >
-                        Body
-                    </label>
-
-                    <textarea class="border border-gray-400 p-2 w-full"
-                           name="body"
-                           id="body"
-                           required
-                    >{{ old('body') }}</textarea>
-
-                    @error('body')
-                        <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700" for="thumbnail">
-                        Thumbnail
-                    </label>
-                    <input class="border border-gray-400 p-2 w-full"
-                        type="file"
-                        name="thumbnail"
-                        id="thumbnail"
-                        required
-                    >
-                    @error('thumbnail')
-                    <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-                        
-
-                <div class="mb-6">
-                    <label class="block mb-2 uppercase font-bold text-xs text-gray-700"
-                           for="type_id"
-                    >
-                        Type
-                    </label>
+                <x-form.input name="title" />
+                <x-form.input name="slug" />
+                <x-form.input name="thumbnail" type="file" />
+                <x-form.textarea name="excerpt" />
+                <x-form.textarea name="body" />
+                <x-form.field>
+                    <x-form.label name="type" />
 
                     <select name="type_id" id="type_id">
                         @foreach (\App\Models\Type::all() as $type)
@@ -112,12 +22,9 @@
                         @endforeach
                     </select>
 
-                    @error('type')
-                        <p class="text-red-500 text-xs mt-2">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <button>Create !</button>
+                    <x-form.error name="type" />
+                </x-form.field>
+                <x-form.button>Publish</x-form.button>
             </form>
         </main>
     </section>

@@ -906,3 +906,9 @@ update course.blade.php to show image:
  ```php
      <img src="{{ asset('storage/' . $course->thumbnail) }}" alt="Course image" class="rounded-xl">
  ```
+
+ ---
+ ### 8.3 Extract Form component 
+ componets/form/input.blade.php
+ `<x-form.input name="Title" />` -- to refer that file 
+ 
