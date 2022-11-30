@@ -1,8 +1,7 @@
 # Laravel - course 
 Based on laravel framework is a try to adopt fully working course-management system written in PHP 
 
-Big up for Jeffrey Way and laracasts.com
-I have started php yourney from some early tutsplus wordpress / php tutorials 
+
 
 
 ## 1. Routing 
