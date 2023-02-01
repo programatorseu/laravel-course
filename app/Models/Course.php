@@ -29,11 +29,6 @@ class Course extends Model
                                 
     }
 
-    public function getRouteKeyName() 
-    {
-        return 'url';
-    }
-
     public function type() 
     {
         return $this->belongsTo(Type::class);
@@ -41,5 +36,10 @@ class Course extends Model
     public function creator() 
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+    
+    public function comments() 
+    {
+        return $this->hasMany(Comment::class);
     }
 }
